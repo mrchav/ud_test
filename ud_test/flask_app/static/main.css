@@ -1,0 +1,15 @@
+h1{
+}
+
+li {
+    list-style-type: none;
+    display: inline; /* Отображать как строчный элемент */
+
+}
+.col-red{
+    color:red;
+}
+td{
+    margin: 5px;
+    padding: 5px;
+}

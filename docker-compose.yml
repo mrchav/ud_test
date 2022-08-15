@@ -1,0 +1,96 @@
+version: "3.9"  #
+services:
+  flask:
+    # Путь до Dockerfile
+    build: ./ud_test/flask_app
+    # Имя для создаваемого контейнера
+    container_name: backend-flask
+    # Создание переменных окружения в контейнере
+    environment:
+      POSTGRES_HOST: db
+
+    # Перезапускаем сервис в случае падения
+    restart: always
+    # Прокладывам путь для файлов. Все файлы, которые хранятся у вас в
+    # директории ./backend, появятся в директории контейнера /backend
+    volumes:
+      - ./flask_back:/flask_back
+    # Открываем порт в контейнер
+    # Порт, который будет смотреть наружу : порт который используется внутри контейнера
+    ports:
+      - "5000:5000"
+    links:
+      - db
+    #entrypoint: /flask_back/flask_app/entrypoint.sh
+    entrypoint: ./entrypoint.sh
+
+    #ENTRYPOINT ["./entrypoint.sh"]
+
+    #command: python app.py
+    #command: ["python app.py", "flask db init", "flask db migrate", "flask db upgrade"]
+
+
+  db:
+    image: postgres:14.5-alpine
+    container_name: db_postgress
+
+    ports:
+    - 5432:5432
+    volumes:
+      - ./pg_data:/var/lib/postgresql/pgdata
+
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123123
+      POSTGRES_DB: test_ud
+      PGDATA: /var/lib/postgresql/pgdata
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+
+  tasks:
+    build: ./ud_test_tasks/tasks 
+    container_name: tasks
+    restart: always
+    volumes:
+      - ./tasks_back:/tasks_back
+    links:
+      - redis
+      - flask
+      - worker
+
+    entrypoint: ./entrypoint_second.sh
+  
+  tasks_script:
+    build: ./ud_test_tasks/tasks 
+    container_name: tasks_script
+    volumes:
+      - ./tasks_back:/tasks_back
+    links:
+      - redis
+      - flask
+      - worker
+
+    #entrypoint: ./entrypoint_tasks_script.sh
+    command: python main.py
+
+  worker:
+    build: ./ud_test_tasks/tasks 
+    container_name: worker
+    restart: always
+    volumes:
+      - ./tasks_worker:/tasks_worker
+    links:
+      - redis
+
+    entrypoint: ./entrypoint_first.sh
+
+      
+
+
+
+

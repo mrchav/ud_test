@@ -1,0 +1,27 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h1> все операции</h1>
+<hr>
+<table>
+    <tr>
+
+        <td>№</td>
+        <td>заказ №</td>
+        <td>стоимость,$</td>
+        <td>стоимость в руб.</td>
+        <td>срок поставки</td>
+    </tr>
+    {% for order in orders %}
+
+    <tr>
+        <td>{{order.source_id}}</td>
+        <td>{{order.order_number}}</td>
+        <td>{{order.cost_us}}</td>
+        <td>{{order.cost_ru}}</td>
+        <td>{{order.date.strftime('%d.%m.%Y')}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
